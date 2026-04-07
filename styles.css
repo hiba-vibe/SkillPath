@@ -1,0 +1,539 @@
+/* ============================================================
+   styles.css  —  SkillPath AI Learning Roadmap
+   ============================================================
+   READING TIP FOR BEGINNERS:
+   CSS rules look like:
+       selector { property: value; }
+   The selector picks which HTML element(s) to style.
+   Properties like color, font-size, padding change the look.
+   ============================================================ */
+
+
+/* ── 1. CSS VARIABLES (design tokens) ────────────────────────
+   :root is a pseudo-class that targets the <html> element.
+   Defining variables here lets us reuse colours / sizes 
+   everywhere — change one line and the whole app updates.
+   ──────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #f7f6f3;   /* warm off-white background — classic Notion feel  */
+  --surface:     #ffffff;   /* pure white for cards                             */
+  --border:      #e8e6e0;   /* subtle warm-grey border colour                   */
+  --text-main:   #1a1917;   /* almost-black for headings                        */
+  --text-muted:  #787672;   /* medium grey for secondary text                   */
+  --accent:      #d4a843;   /* warm amber — the single "pop" colour             */
+  --accent-dark: #b8912e;   /* darker amber for hover states                    */
+  --accent-pale: #fdf3dc;   /* very pale amber for check button backgrounds     */
+  --line-color:  #e0ddd6;   /* colour of the vertical timeline connector line   */
+  --radius:      14px;      /* border-radius used on cards                      */
+  --shadow:      0 2px 16px rgba(0,0,0,0.07); /* soft box-shadow for cards     */
+  --transition:  0.25s ease; /* standard transition duration used throughout    */
+}
+
+
+/* ── 2. RESET & BASE ──────────────────────────────────────────
+   Browsers add default margins/padding/font-sizes that differ 
+   between Chrome, Firefox, Safari etc.  We reset them for a 
+   consistent starting point.
+   ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;  /* padding & border are included in element width   */
+  margin: 0;               /* remove default browser margins everywhere        */
+  padding: 0;              /* remove default browser padding everywhere        */
+}
+
+html {
+  scroll-behavior: smooth; /* animate the page when we jump to an anchor link  */
+}
+
+body {
+  font-family: 'DM Sans', sans-serif; /* our chosen body font from Google Fonts */
+  background: var(--bg);              /* warm off-white page background          */
+  color: var(--text-main);            /* default text colour                     */
+  min-height: 100vh;                  /* page is always at least the full screen */
+  padding-bottom: 80px;               /* breathing room at the very bottom        */
+}
+
+
+/* ── 3. STICKY PROGRESS BAR ──────────────────────────────────
+   position: sticky + top: 0 keeps this bar glued to the 
+   top of the viewport as the user scrolls down.
+   z-index: 100 puts it above everything else visually.
+   ──────────────────────────────────────────────────────────── */
+#progress-track {
+  position: sticky;       /* stays at the top while scrolling                  */
+  top: 0;                 /* exactly at the top edge                           */
+  left: 0;
+  width: 100%;            /* full page width                                   */
+  height: 5px;            /* thin strip                                        */
+  background: var(--border); /* grey "empty" track                             */
+  z-index: 100;           /* layer it above other elements                     */
+}
+
+#progress-fill {
+  height: 100%;           /* same height as the track                          */
+  width: 0%;              /* starts at 0% — React updates this via inline style */
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  /* a left-to-right amber gradient for visual polish                          */
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  /* smooth, slightly "springy" CSS transition when width changes              */
+  /* cubic-bezier is a custom easing curve — 0.4,0,0.2,1 is Material Design's
+     "standard" easing — accelerates quickly then decelerates smoothly         */
+}
+
+
+/* ── 4. MAIN LAYOUT CONTAINER ────────────────────────────────
+   max-width + margin auto = horizontally centred column,
+   just like a Notion page.
+   ──────────────────────────────────────────────────────────── */
+.container {
+  max-width: 720px;       /* never wider than 720px                            */
+  margin: 0 auto;         /* auto left/right margin = centred                  */
+  padding: 60px 24px 0;  /* top breathing room, 24px side padding on mobile   */
+}
+
+
+/* ── 5. HEADER / HERO SECTION ────────────────────────────────*/
+.hero {
+  text-align: center;     /* centre all text inside                            */
+  margin-bottom: 48px;    /* space below the hero before the input box         */
+}
+
+.hero-badge {
+  display: inline-block;  /* shrink-wraps around its text                      */
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em; /* slightly spaced-out letters = "label" feel        */
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 99px;    /* pill shape                                        */
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif; /* elegant serif for the big title   */
+  font-size: clamp(32px, 5vw, 52px);
+  /* clamp(min, preferred, max) — responsive font size without media queries   */
+  line-height: 1.15;      /* tight leading looks better for display headings   */
+  color: var(--text-main);
+  margin-bottom: 14px;
+}
+
+.hero h1 em {
+  font-style: italic;     /* the <em> tag in JSX will italicise "AI-Powered"   */
+  color: var(--accent-dark);
+}
+
+.hero p {
+  font-size: 17px;
+  color: var(--text-muted);
+  max-width: 480px;       /* keep the sub-headline narrower for readability    */
+  margin: 0 auto;         /* centre this narrower block                        */
+  line-height: 1.6;       /* comfortable reading line-height for body copy     */
+}
+
+
+/* ── 6. INPUT / SEARCH BAR ───────────────────────────────────*/
+.input-wrapper {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 8px 8px 8px 20px;   /* more left padding for the text input        */
+  display: flex;                /* row layout: [input] [button]                */
+  align-items: center;          /* vertically centre both items                */
+  gap: 10px;
+  box-shadow: var(--shadow);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  margin-bottom: 48px;
+}
+
+.input-wrapper:focus-within {
+  /* :focus-within activates when ANY child element has focus (like the <input>) */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(212, 168, 67, 0.15); /* soft amber glow ring     */
+}
+
+.goal-input {
+  flex: 1;                /* take up ALL remaining space inside the flex row   */
+  border: none;           /* remove default input border                       */
+  outline: none;          /* remove the default browser focus ring             */
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--text-main);
+  padding: 10px 0;        /* vertical padding inside the text field            */
+}
+
+.goal-input::placeholder {
+  color: var(--text-muted); /* style the placeholder text colour               */
+}
+
+.goal-input:disabled {
+  cursor: not-allowed;    /* show "not allowed" cursor when the input is locked */
+}
+
+.generate-btn {
+  background: var(--accent);
+  color: white;
+  border: none;           /* remove default button border                      */
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;        /* show hand cursor on hover                         */
+  white-space: nowrap;    /* don't wrap the button text onto two lines         */
+  transition: background var(--transition), transform var(--transition),
+              box-shadow var(--transition);
+  /* animate background colour, scale, and shadow on state changes             */
+}
+
+.generate-btn:hover:not(:disabled) {
+  /* :not(:disabled) — only apply hover styles when button is NOT disabled     */
+  background: var(--accent-dark);
+  transform: translateY(-1px);          /* lift button up 1px on hover         */
+  box-shadow: 0 4px 14px rgba(212, 168, 67, 0.4); /* amber glow shadow        */
+}
+
+.generate-btn:active:not(:disabled) {
+  transform: translateY(0);  /* push back down when actually clicked           */
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ── 7. API KEY NOTICE ───────────────────────────────────────*/
+.api-notice {
+  background: var(--accent-pale);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--accent-dark);
+  margin-bottom: 32px;
+  line-height: 1.55;
+}
+
+.api-notice a {
+  color: var(--accent-dark);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px; /* small gap between text and underline          */
+}
+
+
+/* ── 8. SHIMMER LOADING SKELETON ─────────────────────────────
+   While the AI is "thinking", we show placeholder cards with a
+   moving shimmer effect — looks much better than a plain spinner.
+   ──────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  /* @keyframes defines a named animation.  "shimmer" is our name.             */
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+  /* We slide a gradient across the element: starts left, ends right.         */
+}
+
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 20px 64px;  /* left padding makes room for the circle     */
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;              /* clip the shimmer gradient to the card edges */
+}
+
+.skeleton-card::after {
+  /* ::after inserts a pseudo-element AFTER the card's content — we use it 
+     as the animated shimmer overlay                                            */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;   /* cover the whole card            */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.7) 50%,
+    transparent 100%
+  );
+  /* a horizontal gradient: transparent → bright white → transparent          */
+  background-size: 600px 100%;   /* wide enough to sweep across the card       */
+  animation: shimmer 1.4s infinite linear;
+  /* plays the "shimmer" keyframes forever at a steady speed                   */
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: var(--border);     /* grey placeholder "line"                    */
+  margin-bottom: 10px;
+}
+
+.skeleton-line.short { width: 55%; }  /* simulate a shorter second line       */
+
+
+/* ── 9. SECTION HEADER (above the timeline) ─────────────────*/
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* [title + count] on left, [clear btn] right */
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.timeline-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text-main);
+}
+
+.step-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--border);
+  padding: 3px 10px;
+  border-radius: 99px;     /* pill shape                                       */
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.clear-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.clear-btn:hover {
+  border-color: #e07070;   /* red-ish border on hover = "danger" affordance    */
+  color: #c0504a;
+  background: #fff5f5;
+}
+
+
+/* ── 10. VERTICAL TIMELINE ────────────────────────────────────
+   The magic of the timeline is:
+     • Each .step-card is position:relative so we can place 
+       the circle absolutely inside it.
+     • .timeline is position:relative so the ::after pseudo-element
+       (the vertical line) can be positioned relative to it.
+   ──────────────────────────────────────────────────────────── */
+.timeline {
+  position: relative; /* establishes positioning context for the ::after line  */
+}
+
+.timeline::after {
+  /* This pseudo-element IS the vertical grey connector line                    */
+  content: '';               /* pseudo-elements need content (even if empty)   */
+  position: absolute;
+  left: 19px;                /* align with the centre of the 40px circles      */
+  top: 20px;                 /* start just below the first circle              */
+  bottom: 20px;              /* stop just above the last circle                */
+  width: 2px;
+  background: var(--line-color);
+  z-index: 0;                /* sit BEHIND the step cards                      */
+}
+
+/* ── 10a. INDIVIDUAL STEP CARD ────────────────────────────── */
+.step-card {
+  display: flex;             /* row: [circle button] [text content]            */
+  align-items: flex-start;   /* align to top so tall cards look right          */
+  gap: 20px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  position: relative;        /* needed for z-index to work                     */
+  z-index: 1;                /* sit ABOVE the ::after connector line           */
+  transition: border-color var(--transition), box-shadow var(--transition),
+              transform var(--transition);
+  cursor: default;
+}
+
+.step-card:hover {
+  border-color: rgba(212, 168, 67, 0.4);
+  box-shadow: var(--shadow);
+  transform: translateX(3px); /* subtle slide-right on hover = interactive feel */
+}
+
+/* When the step is completed, add a green-ish tint to the card */
+.step-card.completed {
+  background: #fbfaf7;
+  border-color: rgba(212, 168, 67, 0.25);
+}
+
+/* ── 10b. CHECK BUTTON (the circle on the left) ─────────────*/
+.check-btn {
+  flex-shrink: 0;            /* never let it shrink smaller than 40x40         */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;        /* 50% = perfect circle                           */
+  border: 2.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  font-size: 16px;           /* size of the ✓ emoji inside                     */
+  position: relative;        /* z-index only works on positioned elements      */
+  z-index: 2;                /* above the connector line                       */
+}
+
+.check-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-pale);
+  transform: scale(1.1);     /* grow 10% on hover                              */
+}
+
+/* When the step is complete, make the circle filled amber */
+.step-card.completed .check-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ── 10c. TEXT CONTENT inside the card ──────────────────────*/
+.step-content {
+  flex: 1;                   /* take all remaining width after the circle      */
+  min-width: 0;              /* prevents text overflow in flex containers      */
+}
+
+.step-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  margin-bottom: 4px;
+}
+
+.step-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* Strikethrough + dim the main text when completed */
+.step-card.completed .step-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.step-subtext {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* Fade the subtext when completed */
+.step-card.completed .step-subtext {
+  opacity: 0.6;
+}
+
+
+/* ── 11. COMPLETION BANNER ────────────────────────────────────
+   Shown when 100% of steps are ticked.
+   ──────────────────────────────────────────────────────────── */
+.completion-banner {
+  text-align: center;
+  padding: 40px 24px;
+  background: linear-gradient(135deg, #fffbf0, #fff8e7);
+  border: 2px solid rgba(212, 168, 67, 0.35);
+  border-radius: 20px;
+  margin-top: 32px;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  /* cubic-bezier here creates a "spring overshoot" pop-in effect              */
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.completion-banner .trophy {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: bounce 1s ease infinite;
+  /* the trophy bounces forever using the "bounce" keyframes below             */
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+  /* moves 8px up at the midpoint of the animation, creating a bounce         */
+}
+
+.completion-banner h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.completion-banner p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+
+/* ── 12. EMPTY STATE (before any roadmap is generated) ───────*/
+.empty-state {
+  text-align: center;
+  padding: 48px 0 32px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 52px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-state p {
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+
+/* ── 13. CARD ENTER ANIMATION ────────────────────────────────
+   Each step card fades up when it first appears.
+   The React code adds style={{ animationDelay: `${i*0.07}s` }}
+   so cards stagger one-by-one rather than all appearing together.
+   ──────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-card {
+  animation: fadeUp 0.45s ease both;
+  /* "both" applies the from-state before start and to-state after end        */
+}
+
+
+/* ── 14. RESPONSIVE MOBILE TWEAKS ────────────────────────────
+   @media applies rules only when the screen matches the condition.
+   max-width: 520px means "on screens narrower than 520px".
+   ──────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .container { padding: 32px 16px 0; }
+  .hero h1   { font-size: 30px; }
+  .generate-btn { padding: 12px 14px; font-size: 14px; }
+  .step-card { padding: 16px 14px; gap: 14px; }
+  .check-btn { width: 34px; height: 34px; font-size: 14px; }
+  .timeline::after { left: 16px; }
+}

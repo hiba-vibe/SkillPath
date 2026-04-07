@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!-- 
+  LINE 1: DOCTYPE declaration — tells the browser this is an HTML5 document.
+  Always put this at the very top of every HTML file.
+-->
+
+<html lang="en">
+<!-- 
+  LINE 3: <html> is the root element that wraps ALL content on the page.
+  lang="en" tells browsers and screen-readers the page language is English.
+-->
+
+<head>
+  <!-- 
+    <head> contains "meta" info about the page — things the browser needs 
+    but the user doesn't directly see (title, styles, scripts).
+  -->
+
+  <meta charset="UTF-8" />
+  <!-- UTF-8 allows the page to display any character — emojis, accents, etc. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 
+    Makes the page responsive on mobile phones.
+    width=device-width  → use the screen's actual width
+    initial-scale=1.0   → don't zoom in or out by default
+  -->
+
+  <title>SkillPath — AI Learning Roadmap</title>
+  <!-- The text that appears on the browser tab -->
+
+  <!-- ── GOOGLE FONTS ─────────────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <!-- 
+    These three <link> tags load two Google Fonts:
+      • DM Serif Display  — elegant serif for headings (the "Notion-like" feel)
+      • DM Sans           — clean sans-serif for body text
+    preconnect speeds up the font download by opening the connection early.
+  -->
+
+  <!-- ── OUR STYLESHEET ───────────────────────────────────────────────────── -->
+  <link rel="stylesheet" href="styles.css" />
+  <!-- 
+    Links our external CSS file (styles.css).
+    The browser will download and apply every rule in that file.
+  -->
+
+  <!-- ── REACT & BABEL (loaded from CDN — no build step needed!) ──────────── -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <!-- React core library — gives us useState, useEffect, JSX support -->
+
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- ReactDOM — lets React render components into real HTML DOM elements -->
+
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- 
+    Babel transpiler running IN the browser.
+    It converts JSX (the HTML-like syntax inside JS) into plain JavaScript
+    that the browser actually understands.
+    NOTE: In a production app you'd use a build tool (Vite/CRA), but this 
+    CDN approach is perfect for learning — zero setup required!
+  -->
+
+</head>
+
+<body>
+  <!-- Everything visible on the page goes inside <body> -->
+
+  <!-- ── PROGRESS BAR (sticky top strip) ─────────────────────────────────── -->
+  <div id="progress-track">
+    <!-- 
+      The grey "track" behind the coloured progress bar.
+      position:sticky in CSS keeps it glued to the top while you scroll.
+    -->
+    <div id="progress-fill"></div>
+    <!-- 
+      The coloured fill — React will set its width dynamically 
+      (e.g. style="width: 60%") to reflect how many steps are done.
+    -->
+  </div>
+
+  <!-- ── REACT ROOT ────────────────────────────────────────────────────────── -->
+  <div id="root"></div>
+  <!-- 
+    This single <div> is where React "mounts" — it will inject all the 
+    component HTML here at runtime.  It starts empty; React fills it in.
+  -->
+
+  <!-- ── OUR REACT APPLICATION SCRIPTS ────────────────────────────────────── -->
+  <script type="text/babel" src="roadmap.js"></script>
+  <!-- 
+    roadmap.js  — helper functions: AI fetch, mock data, localStorage utils.
+    type="text/babel" tells Babel (loaded above) to transpile this file
+    before the browser runs it. Without this, JSX would cause a syntax error.
+  -->
+
+  <script type="text/babel" src="app.js"></script>
+  <!-- 
+    app.js — the main React component tree and ReactDOM.render() call.
+    Loaded AFTER roadmap.js so it can use the helpers defined there.
+  -->
+
+</body>
+</html>
